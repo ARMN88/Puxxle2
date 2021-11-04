@@ -172,7 +172,7 @@ window.onload = function() {
   readTextFile("animations/chest.json", data => {
     chest.then(() => {
       chest.obj.done = true;
-      animate(JSON.parse(data), chest.obj, "open");
+      animate(JSON.parse(data), chest.obj, "close");
     });
   });
   
