@@ -1,0 +1,8 @@
+# Made in Blockbench 3.9.3
+newmtl m_0
+map_Kd atm.png 
+newmtl m_1
+map_Kd face.png
+newmtl m_2
+map_Kd buttons.png
+newmtl none

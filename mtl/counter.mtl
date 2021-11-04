@@ -1,0 +1,14 @@
+# Made in Blockbench 3.9.3
+newmtl m_1
+map_Kd pillar.png 
+newmtl m_2
+map_Kd countert.png
+newmtl m_3
+map_Kd stand.png
+newmtl m_4
+map_Kd trim.png
+newmtl m_5
+map_Kd door.png
+newmtl m_6
+map_Kd texture.png
+newmtl none
