@@ -21,6 +21,7 @@ let divider = [];
 let computer = [];
 let money = [];
 let chest;
+let comboLock;
 
 // Text
 let text = "This is some text!".split("");
@@ -42,7 +43,6 @@ doorTexture.magFilter = THREE.NearestFilter;
 doorTexture.minFilter = THREE.NearestFilter;
 
 let doorMat = [
-  
   new THREE.MeshBasicMaterial({
     map: doorTexture,
     side: THREE.DoubleSide
@@ -160,14 +160,6 @@ function update() {
   }
   // keep camera level
    camera.position.y = 4.5
-  if(chest.obj.done) {
-    readTextFile("animations/chest.json", data => {
-      if(chest.ready) {
-        animate(JSON.parse(data), chest.obj, "close");
-      }
-    });
-  }
-  
   // render scene
   renderer.render(scene, camera);
 }
@@ -177,52 +169,59 @@ window.onload = function() {
   init();
   setInterval(update, 1000/60);
   //update();
-  setTimeout(function() {
   readTextFile("animations/chest.json", data => {
-    if(chest.ready) {
+    chest.then(() => {
       chest.obj.done = true;
-      animate(JSON.parse(data), chest.obj, "close");
-    }
+      animate(JSON.parse(data), chest.obj, "open");
+    });
   });
-  }, 100);
+  
+  readTextFile("animations/combo-lock.json", data => {
+    comboLock.then(() => {
+      comboLock.obj.done = true;
+      animate(JSON.parse(data), comboLock.obj, "close");
+    });
+  });
 };
 
 // ****************************** FUNCTIONS ******************************
 // animate model
 function animate(jsn, obj, anim) {
+  let jsjsjs = {};
   if(obj && jsn && obj.done) {
     obj.done = false;
-    jsn.x = 0;
-    jsn.poso = {};
-    jsn.rot = {};
-    jsn.frames = {};
-    jsn.timeline = {};
-    jsn.timelineTime = {};
-    jsn.dur = 0;
+    jsjsjs[obj.name] = {};
+    jsjsjs[obj.name].x = 0;
+    jsjsjs[obj.name].poso = {};
+    jsjsjs[obj.name].rot = {};
+    jsjsjs[obj.name].frames = {};
+    jsjsjs[obj.name].timeline = {};
+    jsjsjs[obj.name].timelineTime = {};
+    jsjsjs[obj.name].dur = 0;
     for (const [key, value] of Object.entries(obj.children)) {
      
       for (const [skey, svalue] of Object.entries(jsn.animations[anim].bones[value.name].position)) {
-        if(!jsn.frames[value.name]) {
-          jsn.frames[value.name] = [];
+        if(!jsjsjs[obj.name].frames[value.name]) {
+          jsjsjs[obj.name].frames[value.name] = [];
         }
-        jsn.nkeys = Object.keys(jsn.animations[anim].bones[value.name].position);
-        jsn.nextIndex = jsn.nkeys.indexOf(skey) -1;
-        jsn.nextItem = jsn.nkeys[jsn.nextIndex];
-        jsn.dur = 0;
-        if(jsn.nextItem) {
-          jsn.dur = Number(skey) - Number(jsn.nextItem);
+        jsjsjs[obj.name].nkeys = Object.keys(jsn.animations[anim].bones[value.name].position);
+        jsjsjs[obj.name].nextIndex = jsjsjs[obj.name].nkeys.indexOf(skey) -1;
+        jsjsjs[obj.name].nextItem = jsjsjs[obj.name].nkeys[jsjsjs[obj.name].nextIndex];
+        jsjsjs[obj.name].dur = 0;
+        if(jsjsjs[obj.name].nextItem) {
+          jsjsjs[obj.name].dur = Number(skey) - Number(jsjsjs[obj.name].nextItem);
         }
-        jsn.frames[value.name].push({
+        jsjsjs[obj.name].frames[value.name].push({
           x: jsn.animations[anim].bones[value.name].position[skey][0],
           y: jsn.animations[anim].bones[value.name].position[skey][1],
           z: jsn.animations[anim].bones[value.name].position[skey][2],
           rx: jsn.animations[anim].bones[value.name].rotation[skey][0],
           ry: jsn.animations[anim].bones[value.name].rotation[skey][1],
           rz: jsn.animations[anim].bones[value.name].rotation[skey][2],
-          duration: jsn.dur
+          duration: jsjsjs[obj.name].dur
         });
       }
-      jsn.poso[key] = {
+      jsjsjs[obj.name].poso[key] = {
         x: value.position.x,
         y: value.position.y,
         z: value.position.z,
@@ -230,27 +229,27 @@ function animate(jsn, obj, anim) {
         ry: 0,
         rz: 0
       }
-      jsn.timelineTime[key] = 0;
-      jsn.timeline[key] = gsap.to(jsn.poso[key], {
-        keyframes: jsn.frames[value.name]
+      jsjsjs[obj.name].timelineTime[key] = 0;
+      jsjsjs[obj.name].timeline[key] = gsap.to(jsjsjs[obj.name].poso[key], {
+        keyframes: jsjsjs[obj.name].frames[value.name]
       });
     }
-    jsn.x++;
+    jsjsjs[obj.name].x++;
   }
   let inter = setInterval(function() {
-  if(obj && jsn && !obj.done) {
+  if(obj && jsjsjs[obj.name] && !obj.done) {
   for (const [key, value] of Object.entries(obj.children)) {
     value.geometry.computeBoundingBox();
-    jsn.timelineTime[key] += 0.01;
-    jsn.timeline[key].seek(jsn.timelineTime[key]);
-    value.position.x = -map(jsn.poso[key].x) + value.gposition.x;
-    value.position.y = map(jsn.poso[key].y) + value.gposition.y;
-    value.position.z = map(jsn.poso[key].z) + value.gposition.z;
-    value.rotation.x = jsn.poso[key].rx * -Math.PI/180;
-    value.rotation.y = jsn.poso[key].ry* Math.PI/180;
-    value.rotation.z = jsn.poso[key].rz* Math.PI/180;
-    if(jsn.timelineTime[key] >= Number(jsn.animations[anim].animation_length)) {
-      jsn.timelineTime[key] = 0;
+    jsjsjs[obj.name].timelineTime[key] += 0.01;
+    jsjsjs[obj.name].timeline[key].seek(jsjsjs[obj.name].timelineTime[key]);
+    value.position.x = -map(jsjsjs[obj.name].poso[key].x) + value.gposition.x;
+    value.position.y = map(jsjsjs[obj.name].poso[key].y) + value.gposition.y;
+    value.position.z = map(jsjsjs[obj.name].poso[key].z) + value.gposition.z;
+    value.rotation.x = jsjsjs[obj.name].poso[key].rx * -Math.PI/180;
+    value.rotation.y = jsjsjs[obj.name].poso[key].ry* Math.PI/180;
+    value.rotation.z = jsjsjs[obj.name].poso[key].rz* Math.PI/180;
+    if(jsjsjs[obj.name].timelineTime[key] >= Number(jsn.animations[anim].animation_length)) {
+      jsjsjs[obj.name].timelineTime[key] = 0;
       clearInterval(inter);
       obj.done = true;
     }
@@ -386,3 +385,11 @@ function Text(str, tm) {
     document.querySelector("p").innerHTML += str.split("")[upnum-tm];
   }
 }
+// ****************************** SAMPLES ******************************
+/*
+readTextFile("animations/chest.json", data => {
+    if(chest.ready) {
+      animate(JSON.parse(data), chest.obj, "close");
+    }
+  });
+*/
