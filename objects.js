@@ -66,7 +66,7 @@ let box = new THREE.Box3().setFromObject(value);
     });
   });
 */
-async function importOBJ(objf, mtl, x=0, y=0, z=-15, size=160, rx=0, ry=0, rz=0) {
+async function importOBJ(objf, mtl, size=160, x=0, y=0, z=-15, rx=0, ry=0, rz=0) {
   let objv = {};
   let promise = new Promise((resolve, reject) => {
   objv.mtlloader = new THREE.MTLLoader();
@@ -1894,11 +1894,15 @@ money[2].mtlloader = new THREE.MTLLoader();
     });
   });
 
-//chest = importOBJ("chest", "chest", -28.5, 0, -35, 35);
-chest = importOBJ("chest", "chest", 0, 2, -40, 35, 0, 270 * Math.PI/180, 0);
-let current = 6;
-// 6,7,8,9
+chest = importOBJ("chest", "chest", 35, -28.8, 0, -32);
 chest.then(object => {
   chest.ready = true;
   chest.obj = object.object;
+});
+
+comboLock = importOBJ("combo-lock", "combo-lock", 10, -26.3, 0.55, -32);
+
+comboLock.then(object => {
+  comboLock.ready = true;
+  comboLock.obj = object.object;
 });
