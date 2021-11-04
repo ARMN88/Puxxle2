@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  background: black;
+  touch-action: none;
+  overflow: hidden;
+  color: white;
+}
+
+.cir {
+  margin: 0;
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px black solid;
+  background: rgba(255, 255, 255, .7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+p {
+  margin: 0;
+  position: fixed;
+  font-size: 3em;
+  width: 100%;
+  text-align: center;
+  bottom: 2%;
+  color: yellow;
+  text-shadow: 1px 1px 2px black, 0 0 1em black, 0 0 0.2em black;
+  font-family: "Arial";
+}
