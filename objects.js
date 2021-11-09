@@ -66,7 +66,7 @@ let box = new THREE.Box3().setFromObject(value);
     });
   });
 */
-async function importOBJ(objf, mtl, size=160, x=0, y=0, z=-15, rx=0, ry=0, rz=0) {
+async function importOBJ(objf, mtl, size=160, x=0, y=0, z=0, rx=0, ry=0, rz=0, collision=true) {
   let objv = {};
   let promise = new Promise((resolve, reject) => {
   objv.mtlloader = new THREE.MTLLoader();
@@ -109,27 +109,28 @@ async function importOBJ(objf, mtl, size=160, x=0, y=0, z=-15, rx=0, ry=0, rz=0)
             value.position.z = value.gposition.z;
          }
        }
+        if(collision) {
         let box = new THREE.Box3().setFromObject(object);
-      let d = new THREE.Mesh(
-        new THREE.BoxGeometry(box.getSize().x, box.getSize().y, box.getSize().z),
-        new THREE.MeshBasicMaterial({color: "red"})
-      );
-         
-      d.position.x = box.getCenter().x;
-      d.position.y = box.getCenter().y;
-      d.position.z = box.getCenter().z;
-      d.x = d.position.x;
-      d.y = d.position.y;
-      d.z = d.position.z;
-      d.sx = box.getSize().x;
-      d.sy = box.getSize().y;
-      d.sz = box.getSize().z;
-      d.bx = d.x;
-      blocks.unshift(d);
-      d.material.transparent = true;
-      if(showCollision) { d.material.opacity = .4}else{ d.material.opacity = 0}
-      d.name = object.name;
-      scene.add(d);
+        let d = new THREE.Mesh(
+          new THREE.BoxGeometry(box.getSize().x, box.getSize().y, box.getSize().z),
+          new THREE.MeshBasicMaterial({color: "red"})
+        );
+        d.position.x = box.getCenter().x;
+        d.position.y = box.getCenter().y;
+        d.position.z = box.getCenter().z;
+        d.x = d.position.x;
+        d.y = d.position.y;
+        d.z = d.position.z;
+        d.sx = box.getSize().x;
+        d.sy = box.getSize().y;
+        d.sz = box.getSize().z;
+        d.bx = d.x;
+        blocks.unshift(d);
+        d.material.transparent = true;
+        if(showCollision) { d.material.opacity = .4}else{ d.material.opacity = 0}
+        d.name = object.name;
+        scene.add(d);
+      }
       resolve(objv);
     });
   });
@@ -1669,49 +1670,6 @@ computer[1].mtlloader = new THREE.MTLLoader();
     });
   });
 
-computer[2] = {};
-computer[2].mtlloader = new THREE.MTLLoader();
-    computer[2].mtlloader.setTexturePath("images/computer/");
-    computer[2].mtlloader.setPath("mtl/");
-    computer[2].mtlloader.load("computer.mtl", function(materials) {
-    materials.preload();
-    computer[2].objloader = new THREE.OBJLoader();
-    for (const [key, value] of Object.entries(materials.materials)) {
-      if (materials.materials[key].map) {
-        materials.materials[key].map.minFilter = THREE.LinearMipMapLinearFilter;
-        materials.materials[key].map.magFilter = THREE.NearestFilter;
-      }
-    }
-      computer[2].objloader.setMaterials(materials);
-      computer[2].objloader.setPath("objs/");
-      computer[2].objloader.load("computer.obj", function(object) {
-      this.size = 6;
-      object.scale.set(this.size, this.size, this.size);
-      object.position.set(2, 2.3, -12.7);
-      computer[2].object = object;
-      computer[2].object.name = "computer[2]";
-      scene.add(computer[2].object);
-       for (const [key, value] of Object.entries(object.children)) {
-         if(object.children[key].geometry) {
-            value.geometry.computeBoundingBox();
-           this.pos = value.geometry.boundingBox.getCenter();
-            value.geometry.center();
-            value.gposition = {
-              x: 0,
-              y: 0,
-              z: 0
-            }
-            value.gposition.x = this.pos.x;
-            value.gposition.y = this.pos.y;
-            value.gposition.z = this.pos.z;
-            value.position.x = value.gposition.x;
-            value.position.y = value.gposition.y;
-            value.position.z = value.gposition.z;
-         }
-       }
-    });
-  });
-
 computer[3] = {};
 computer[3].mtlloader = new THREE.MTLLoader();
     computer[3].mtlloader.setTexturePath("images/computer/");
@@ -1893,16 +1851,50 @@ money[2].mtlloader = new THREE.MTLLoader();
        }
     });
   });
-
+// chest
 chest = importOBJ("chest", "chest", 35, -28.8, 0, -32);
 chest.then(object => {
   chest.ready = true;
   chest.obj = object.object;
 });
 
+// combo lock
 comboLock = importOBJ("combo-lock", "combo-lock", 10, -26.3, 0.55, -32);
 
 comboLock.then(object => {
   comboLock.ready = true;
   comboLock.obj = object.object;
+});
+
+// clock
+clock = importOBJ("clock", "clock", 50, 29.3, 7, -27, 0, -90*Math.PI/180, 0, false);
+
+clock.then(object => {
+  clock.ready = true;
+  clock.obj = object.object;
+});
+
+// four switches
+for(let i = 0;i < 4; i++) {
+  switches[i] = importOBJ("switch", "switch", 20, 29.45, 4, -(i*1.5)+42, 0, Math.PI/2, 0, false);
+
+  switches[i].then(object => {
+    switches[i].ready = true;
+    switches[i].obj = object.object;
+  });
+}
+
+// final lock
+numLock = importOBJ("numLock", "numLock", 15, -17, 3, 44.4, 0, 0, 0, false);
+
+numLock.then(object => {
+  numLock.ready = true;
+  numLock.obj = object.object;
+});
+
+let atmposter = importOBJ("atmposter", "atmposter", 50, 3, 7, -44.4, 0, 0, 0, false);
+
+atmposter.then(object => {
+  atmposter.ready = true;
+  atmposter.obj = object.object;
 });

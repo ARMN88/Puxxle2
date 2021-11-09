@@ -1,0 +1,6 @@
+# Made in Blockbench 3.9.3
+newmtl m_1
+map_Kd frame.png 
+newmtl m_2
+map_Kd atmposter.png 
+newmtl none
