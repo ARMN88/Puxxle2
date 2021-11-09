@@ -22,12 +22,15 @@ let computer = [];
 let money = [];
 let chest;
 let comboLock;
+let clock;
+let switches = [];
+let numLock;
 
 // Text
 let text = "This is some text!".split("");
 
 // animation is done bool
-let done;
+let height = 4.5;
 
 // Collisions
 let blocks = [];
@@ -159,7 +162,8 @@ function update() {
     }
   }
   // keep camera level
-   camera.position.y = 4.5
+   camera.position.y = height;
+  if(keyboard[16]) {if(camera.position.y > 2.5) {height-=0.5}else{speed = .25}}else{if(camera.position.y < 4.5) {height+=0.5}else{speed = .48}}
   // render scene
   renderer.render(scene, camera);
 }
@@ -180,6 +184,12 @@ window.onload = function() {
     comboLock.then(() => {
       comboLock.obj.done = true;
       animate(JSON.parse(data), comboLock.obj, "close");
+    });
+  });
+  readTextFile("animations/switch.json", data => {
+    switches[0].then(() => {
+      switches[0].obj.done = true;
+      animate(JSON.parse(data), switches[0].obj, "open");
     });
   });
 };
